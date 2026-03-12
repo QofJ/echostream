@@ -35,3 +35,8 @@ export interface ShadowingMode {
 export type ParserResult =
   | { success: true; entries: SubtitleEntry[] }
   | { success: false; error: string };
+
+export interface DedupeOptions {
+  enabled: boolean;
+  mode: 'rolling' | 'duplicate' | 'both';
+}
