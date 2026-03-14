@@ -57,9 +57,20 @@ export function SubtitleDisplay() {
       {/* Current subtitle */}
       <div className="bg-slate-800 rounded-xl p-6 text-center min-h-[120px] flex flex-col justify-center">
         {currentSubtitle ? (
-          <p className="text-xl md:text-2xl text-white leading-relaxed">
-            {currentSubtitle.text}
-          </p>
+          <>
+            {currentSubtitle.speakerChange && (
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <div className="flex gap-0.5">
+                  <span className="w-1.5 h-4 bg-cyan-400 rounded-full" />
+                  <span className="w-1.5 h-4 bg-cyan-400/60 rounded-full" />
+                </div>
+                <span className="text-xs text-cyan-400 font-medium">Speaker</span>
+              </div>
+            )}
+            <p className="text-xl md:text-2xl text-white leading-relaxed">
+              {currentSubtitle.text}
+            </p>
+          </>
         ) : (
           <p className="text-slate-500 italic">
             {nextSubtitle ? 'Get ready...' : 'Waiting for subtitle...'}

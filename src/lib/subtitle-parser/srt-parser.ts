@@ -42,9 +42,13 @@ export function parseSrt(content: string): ParserResult {
       const endTime = parseSrtTime(timeMatch[2]);
 
       // Rest of the lines are the subtitle text
-      const text = lines.slice(2).join('\n').trim();
+      const rawText = lines.slice(2).join('\n').trim();
 
-      entries.push({ index, startTime, endTime, text });
+      // Detect speaker change marker (>>)
+      const speakerChange = rawText.startsWith('>>');
+      const text = speakerChange ? rawText.replace(/^>>\s*/, '') : rawText;
+
+      entries.push({ index, startTime, endTime, text, speakerChange });
     }
 
     if (entries.length === 0) {

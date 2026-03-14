@@ -59,14 +59,18 @@ export function parseVtt(content: string): ParserResult {
       const endTime = parseVttTime(timeMatch[2]);
 
       // Rest of the lines are the subtitle text
-      const text = lines.slice(timeLineIndex + 1)
+      const rawText = lines.slice(timeLineIndex + 1)
         .join('\n')
         .replace(/<[^>]+>/g, '') // Remove VTT tags
         .trim();
 
+      // Detect speaker change marker (>>)
+      const speakerChange = rawText.startsWith('>>');
+      const text = speakerChange ? rawText.replace(/^>>\s*/, '') : rawText;
+
       if (text) {
         entryIndex++;
-        entries.push({ index: entryIndex, startTime, endTime, text });
+        entries.push({ index: entryIndex, startTime, endTime, text, speakerChange });
       }
     }
 

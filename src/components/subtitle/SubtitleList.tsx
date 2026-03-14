@@ -29,9 +29,20 @@ function SubtitleItem({ entry, isActive, onClick }: SubtitleItemProps) {
         <span className="text-xs text-slate-500 shrink-0 mt-0.5">
           {formatTime(entry.startTime)}
         </span>
-        <p className={`text-sm ${isActive ? 'text-white' : 'text-slate-300'}`}>
-          {entry.text}
-        </p>
+        <div className="flex-1">
+          {entry.speakerChange && (
+            <div className="flex items-center gap-1.5 mb-1">
+              <div className="flex gap-0.5">
+                <span className="w-1 h-2.5 bg-cyan-400 rounded-full" />
+                <span className="w-1 h-2.5 bg-cyan-400/60 rounded-full" />
+              </div>
+              <span className="text-[10px] text-cyan-400">Speaker</span>
+            </div>
+          )}
+          <p className={`text-sm ${isActive ? 'text-white' : 'text-slate-300'}`}>
+            {entry.text}
+          </p>
+        </div>
       </div>
     </button>
   );

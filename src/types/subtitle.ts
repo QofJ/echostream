@@ -3,6 +3,7 @@ export interface SubtitleEntry {
   startTime: number;  // seconds
   endTime: number;    // seconds
   text: string;
+  speakerChange?: boolean;  // true if text starts with ">>" marker
 }
 
 export interface AudioPlayerState {
