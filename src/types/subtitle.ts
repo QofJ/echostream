@@ -36,7 +36,15 @@ export type ParserResult =
   | { success: true; entries: SubtitleEntry[] }
   | { success: false; error: string };
 
+export interface FilterOptions {
+  /** Minimum display duration in milliseconds (default: 100) */
+  minDuration?: number;
+  /** Skip entries with empty text (default: true) */
+  skipEmpty?: boolean;
+}
+
 export interface DedupeOptions {
   enabled: boolean;
   mode: 'rolling' | 'duplicate' | 'both';
+  filter?: FilterOptions;
 }

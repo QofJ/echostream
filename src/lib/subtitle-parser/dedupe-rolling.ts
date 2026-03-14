@@ -118,9 +118,10 @@ export function dedupeRollingSubtitles(
     const processed = processEntry(entry, previousEntry, opts.mode);
     if (processed) {
       result.push(processed);
-      previousEntry = processed;
     }
-    // If processed is null, it's a complete duplicate, skip it
+    // Always update previousEntry to the original entry for accurate rolling comparison
+    // This ensures we compare against the actual previous content, not the processed result
+    previousEntry = entry;
   }
 
   // Renumber entries
