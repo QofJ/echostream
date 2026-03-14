@@ -23,7 +23,7 @@ export function SpeedControl() {
       >
         {playbackRate}x
       </button>
-      <div className="flex gap-1">
+      <div className="flex gap-1 hidden sm:flex">
         {SPEED_OPTIONS.map((speed) => (
           <button
             key={speed}
