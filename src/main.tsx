@@ -2,15 +2,18 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { AudioPlayerProvider } from '@/context/AudioPlayerContext';
 import { SubtitleProvider } from '@/context/SubtitleContext';
-import './index.css';
+import { PersistenceProvider } from '@/context/PersistenceContext';
 import App from './App';
+import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AudioPlayerProvider>
-      <SubtitleProvider>
-        <App />
-      </SubtitleProvider>
-    </AudioPlayerProvider>
+    <PersistenceProvider>
+      <AudioPlayerProvider>
+        <SubtitleProvider>
+          <App />
+        </SubtitleProvider>
+      </AudioPlayerProvider>
+    </PersistenceProvider>
   </StrictMode>,
 );
