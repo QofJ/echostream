@@ -1,4 +1,4 @@
-import type { StoredAudio, StoredSubtitle, RestoreResult, SubtitleEntry } from './types';
+import type { StoredAudio, StoredSubtitle, RestoreResult } from './types';
 
 export type { StoredAudio, StoredSubtitle, PersistenceState, RestoreResult } from './types';
 
@@ -67,18 +67,17 @@ export async function saveAudio(file: File): Promise<void> {
   });
 }
 
-export async function saveSubtitle(file: File, entries: SubtitleEntry[]): Promise<void> {
+export async function saveSubtitle(file: File): Promise<void> {
   const db = await openDB();
 
   return new Promise((resolve, reject) => {
     const transaction = db.transaction([SUBTITLE_STORE], 'readwrite');
     const store = transaction.objectStore(SUBTITLE_STORE);
 
-    const data: { id: string } & StoredSubtitle = {
+    const data: { id: string } & Omit<StoredSubtitle, 'entries'> = {
       id: 'current',
       blob: file,
       name: file.name,
-      entries,
       storedAt: Date.now(),
     };
 

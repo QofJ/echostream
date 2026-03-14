@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
-import type { SubtitleEntry } from '@/types/subtitle';
 import type { PersistenceState, RestoreResult } from '@/lib/storage/types';
 import {
   saveAudio as storageSaveAudio,
@@ -11,7 +10,7 @@ import {
 
 interface PersistenceContextValue extends PersistenceState {
   saveAudio: (file: File) => Promise<void>;
-  saveSubtitle: (file: File, entries: SubtitleEntry[]) => Promise<void>;
+  saveSubtitle: (file: File) => Promise<void>;
   restoreData: () => Promise<RestoreResult>;
   clearAllData: () => Promise<void>;
   clearError: () => void;
@@ -63,11 +62,11 @@ export function PersistenceProvider({ children }: { children: ReactNode }) {
   );
 
   const saveSubtitle = useCallback(
-    async (file: File, entries: SubtitleEntry[]) => {
+    async (file: File) => {
       if (!isAvailable) return;
 
       try {
-        await storageSaveSubtitle(file, entries);
+        await storageSaveSubtitle(file);
         setState((prev) => ({ ...prev, hasStoredData: true, error: null }));
       } catch (err) {
         setState((prev) => ({

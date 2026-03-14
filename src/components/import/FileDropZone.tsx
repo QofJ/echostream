@@ -41,7 +41,7 @@ export function FileDropZone() {
         const result = await readSubtitleFile(file);
         if (result.success) {
           loadSubtitles(result.entries, file.name);
-          saveSubtitle(file, result.entries).catch(console.error);
+          saveSubtitle(file).catch(console.error);
         } else {
           setError(result.error);
         }
@@ -64,7 +64,7 @@ export function FileDropZone() {
       const result = await readSubtitleFile(file);
       if (result.success) {
         loadSubtitles(result.entries, file.name);
-        saveSubtitle(file, result.entries).catch(console.error);
+        saveSubtitle(file).catch(console.error);
       } else {
         setError(result.error);
       }

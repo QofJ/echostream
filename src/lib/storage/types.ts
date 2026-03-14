@@ -1,5 +1,3 @@
-import type { SubtitleEntry } from '@/types/subtitle';
-
 export type { SubtitleEntry } from '@/types/subtitle';
 
 export interface StoredAudio {
@@ -12,7 +10,6 @@ export interface StoredAudio {
 export interface StoredSubtitle {
   blob: Blob;
   name: string;
-  entries: SubtitleEntry[];
   storedAt: number;
 }
 

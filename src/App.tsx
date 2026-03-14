@@ -8,6 +8,7 @@ import { ABLoopController } from '@/components/looping/ABLoopController';
 import { useAudioPlayerContext } from '@/context/AudioPlayerContext';
 import { useSubtitleContext } from '@/context/SubtitleContext';
 import { usePersistence } from '@/hooks/usePersistence';
+import { readSubtitleFile } from '@/lib/subtitle-parser';
 
 function AppContent() {
   const { audioFile, loadAudio } = useAudioPlayerContext();
@@ -16,7 +17,7 @@ function AppContent() {
 
   // Restore data from IndexedDB on mount
   useEffect(() => {
-    restoreData().then((result) => {
+    restoreData().then(async (result) => {
       if (result.audio) {
         const file = new File([result.audio.blob], result.audio.name, {
           type: result.audio.type,
@@ -24,7 +25,12 @@ function AppContent() {
         loadAudio(file);
       }
       if (result.subtitle) {
-        loadSubtitles(result.subtitle.entries, result.subtitle.name);
+        // Re-parse the subtitle file to apply latest parser logic
+        const file = new File([result.subtitle.blob], result.subtitle.name);
+        const parsed = await readSubtitleFile(file);
+        if (parsed.success) {
+          loadSubtitles(parsed.entries, result.subtitle.name);
+        }
       }
     });
     // Only run on mount
