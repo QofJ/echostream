@@ -64,9 +64,14 @@ export function parseVtt(content: string): ParserResult {
         .replace(/<[^>]+>/g, '') // Remove VTT tags
         .trim();
 
-      // Detect speaker change marker (>>)
-      const speakerChange = rawText.startsWith('>>');
-      const text = speakerChange ? rawText.replace(/^>>\s*/, '') : rawText;
+      // Detect speaker change marker (>>) on any line
+      const textLines = rawText.split('\n');
+      const speakerChange = textLines.some(line => line.trim().startsWith('>>'));
+      // Remove >> from the beginning of any line
+      const text = textLines
+        .map(line => line.replace(/^>>\s*/, ''))
+        .join('\n')
+        .trim();
 
       if (text) {
         entryIndex++;
