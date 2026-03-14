@@ -1,12 +1,14 @@
 import { useCallback, useState, useRef } from 'react';
-import { FaCloudUploadAlt, FaMusic, FaClosedCaptioning } from 'react-icons/fa';
+import { FaCloudUploadAlt, FaMusic, FaClosedCaptioning, FaTrash } from 'react-icons/fa';
 import { useAudioPlayerContext } from '@/context/AudioPlayerContext';
 import { useSubtitleContext } from '@/context/SubtitleContext';
+import { usePersistence } from '@/hooks/usePersistence';
 import { readSubtitleFile } from '@/lib/subtitle-parser';
 
 export function FileDropZone() {
   const { loadAudio, audioFile } = useAudioPlayerContext();
   const { loadSubtitles, subtitleFile } = useSubtitleContext();
+  const { saveAudio, saveSubtitle, clearAllData, hasStoredData, error: persistenceError } = usePersistence();
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
@@ -34,23 +36,26 @@ export function FileDropZone() {
 
       if (['mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac'].includes(ext || '')) {
         loadAudio(file);
+        saveAudio(file).catch(console.error);
       } else if (['srt', 'vtt'].includes(ext || '')) {
         const result = await readSubtitleFile(file);
         if (result.success) {
           loadSubtitles(result.entries, file.name);
+          saveSubtitle(file, result.entries).catch(console.error);
         } else {
           setError(result.error);
         }
       }
     }
-  }, [loadAudio, loadSubtitles]);
+  }, [loadAudio, loadSubtitles, saveAudio, saveSubtitle]);
 
   const handleAudioSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       loadAudio(file);
+      saveAudio(file).catch(console.error);
     }
-  }, [loadAudio]);
+  }, [loadAudio, saveAudio]);
 
   const handleSubtitleSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -59,11 +64,20 @@ export function FileDropZone() {
       const result = await readSubtitleFile(file);
       if (result.success) {
         loadSubtitles(result.entries, file.name);
+        saveSubtitle(file, result.entries).catch(console.error);
       } else {
         setError(result.error);
       }
     }
-  }, [loadSubtitles]);
+  }, [loadSubtitles, saveSubtitle]);
+
+  const handleClearCache = useCallback(async () => {
+    try {
+      await clearAllData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to clear cache');
+    }
+  }, [clearAllData]);
 
   return (
     <div className="space-y-4">
@@ -136,6 +150,22 @@ export function FileDropZone() {
         <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4 text-red-300 text-sm">
           {error}
         </div>
+      )}
+
+      {persistenceError && (
+        <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-4 text-yellow-300 text-sm">
+          {persistenceError}
+        </div>
+      )}
+
+      {hasStoredData && (
+        <button
+          onClick={handleClearCache}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm text-slate-400 hover:text-slate-300 hover:bg-slate-800 rounded-lg transition-colors"
+        >
+          <FaTrash />
+          <span>Clear Cached Files</span>
+        </button>
       )}
     </div>
   );
