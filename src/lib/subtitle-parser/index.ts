@@ -2,10 +2,12 @@ import type { ParserResult, DedupeOptions } from '@/types/subtitle';
 import { parseSrt } from './srt-parser';
 import { parseVtt } from './vtt-parser';
 import { dedupeRollingSubtitles } from './dedupe-rolling';
+import { filterSubtitleEntries } from './filter-entries';
 
 export { parseSrt } from './srt-parser';
 export { parseVtt } from './vtt-parser';
 export { dedupeRollingSubtitles } from './dedupe-rolling';
+export { filterSubtitleEntries } from './filter-entries';
 
 /**
  * Detect and parse subtitle file based on content
@@ -36,11 +38,28 @@ export function parseSubtitle(
     result = parseSrt(content);
   }
 
-  // Apply deduplication by default for successful parses
+  // Apply deduplication and filtering by default for successful parses
   if (result.success) {
+    const filterOpts = dedupeOptions?.filter;
+
+    // Step 1: Pre-filter - remove empty text entries before deduplication
+    let entries = filterSubtitleEntries(result.entries, {
+      skipEmpty: filterOpts?.skipEmpty ?? true,
+      minDuration: 0  // Don't filter by duration yet, do it after dedupe
+    });
+
+    // Step 2: Deduplication
+    entries = dedupeRollingSubtitles(entries, dedupeOptions);
+
+    // Step 3: Post-filter - remove short duration entries (flickering)
+    entries = filterSubtitleEntries(entries, {
+      skipEmpty: false,  // Already filtered
+      minDuration: filterOpts?.minDuration ?? 100
+    });
+
     result = {
       ...result,
-      entries: dedupeRollingSubtitles(result.entries, dedupeOptions)
+      entries
     };
   }
 
